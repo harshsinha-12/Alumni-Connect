@@ -38,4 +38,4 @@ To install and run this project locally, follow these steps:
 Once the application is running, you can access it at `http://localhost:3000`. Register as a new user or log in with your existing credentials to start using the platform.
 
 ## Live
-Check the live working application at: [Alumni-Connect]((https://alumniconnectnyharsh.netlify.app/))
+Check the live working application at: [Alumni-Connect](https://alumniconnectnyharsh.netlify.app/)
