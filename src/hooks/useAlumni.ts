@@ -8,27 +8,32 @@ export function useAlumni() {
   const alumni = useQuery({
     queryKey: ['alumni'],
     queryFn: fetchAlumni,
+    staleTime: 1000, // Consider data stale after 1 second
   });
 
   const createMutation = useMutation({
     mutationFn: createAlumni,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['alumni'] });
+    onSuccess: (newAlumni) => {
+      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) => [newAlumni, ...old]);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Alumni> }) =>
       updateAlumni(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['alumni'] });
+    onSuccess: (updatedAlumni) => {
+      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) =>
+        old.map((item) => (item.id === updatedAlumni.id ? updatedAlumni : item))
+      );
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteAlumni,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['alumni'] });
+    onSuccess: (_, deletedId) => {
+      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) =>
+        old.filter((item) => item.id !== deletedId)
+      );
     },
   });
 
