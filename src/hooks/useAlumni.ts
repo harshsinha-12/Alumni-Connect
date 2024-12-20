@@ -1,42 +1,31 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchAlumni, createAlumni, updateAlumni, deleteAlumni } from '../services/alumni';
 import type { Alumni } from '../types/alumni';
-
 export function useAlumni() {
   const queryClient = useQueryClient();
-
   const alumni = useQuery({
     queryKey: ['alumni'],
     queryFn: fetchAlumni,
-    staleTime: 1000, // Consider data stale after 1 second
   });
-
   const createMutation = useMutation({
     mutationFn: createAlumni,
-    onSuccess: (newAlumni) => {
-      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) => [newAlumni, ...old]);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumni'] });
     },
   });
-
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Alumni> }) =>
       updateAlumni(id, data),
-    onSuccess: (updatedAlumni) => {
-      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) =>
-        old.map((item) => (item.id === updatedAlumni.id ? updatedAlumni : item))
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumni'] });
     },
   });
-
   const deleteMutation = useMutation({
     mutationFn: deleteAlumni,
-    onSuccess: (_, deletedId) => {
-      queryClient.setQueryData(['alumni'], (old: Alumni[] = []) =>
-        old.filter((item) => item.id !== deletedId)
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['alumni'] });
     },
   });
-
   return {
     alumni: alumni.data ?? [],
     isLoading: alumni.isLoading,
